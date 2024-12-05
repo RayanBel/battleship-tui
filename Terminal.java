@@ -1,21 +1,28 @@
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 public class Terminal {
-        String prefijo="\033[";
-        char sufijo='m';
-        String diccionarioColor[]={"negro","rojo","verde","amarillo","azul","morado","cian", "blanco"};
-        String diccionarioDireccion[]={"arriba", "derecha", "abajo", "izquierda"};
+        private String prefijo="\033[";
+        private char sufijo='m';
+        private String diccionarioColor[]=new String []{"negro","rojo","verde","amarillo","azul","morado","cian", "blanco"};
+        private String diccionarioDireccion[]={"arriba", "abajo", "derecha", "izquierda"};
 
-        String arrayToString(int [] numeros){
-                return numeros != null ? Arrays.stream(numeros)
-                .mapToObj(String::valueOf)
-                .collect(Collectors.joining(";")) : "";
+        private String arrayToString(int [] numeros){
+                String texto= "";
+                for(int i=0;i<numeros.length;i++)
+                        texto+=numeros[i]+(i==numeros.length-1?"":";");
+                return texto;
         }
 
-        // Constructor: limpia la pantalla para mostrar lo que se tenga que mostrar luego
-        public Terminal(){
-                type(ansi(2,'J')+ansi(new int[] {0,0}, 'H')+ansi(0));
+        private int posInArray(String [] lista, String texto){
+                int posicion=-1;
+                for(int i=0;i<lista.length;i++)
+                        if (lista[i].equals(texto)){
+                                posicion=i;
+                                break;
+                        }
+                return posicion;
+        }
+
+        public void type(String texto){
+                System.out.print(texto);
         }
 
         // Añade el prefijo ESC[, concatena todo lo que uno ha de especificar y añade el prefijo m
@@ -50,33 +57,39 @@ public class Terminal {
                 int codigoFondoClaro=10;
                 int colorfondo=9;
 
-                for(int i=0;i<diccionarioColor.length;i++){
-                        if (diccionarioColor[i].equals(texto)) 
-                                colorTexto=i;
-                
-                        if (diccionarioColor[i].equals(fondo))
-                                colorfondo=i;      
-                }
+                colorTexto=posInArray(diccionarioColor, texto)!=-1?posInArray(diccionarioColor, texto):colorTexto;
+                colorfondo=posInArray(diccionarioColor, fondo)!=-1?posInArray(diccionarioColor, fondo):colorfondo;
 
                 return ansi(new int[] {textoclaro?codigoTextoClaro:codigoTextoNormal+colorTexto, fondoclaro?codigoFondoClaro:codigoFondoNormal+colorfondo});
         }
 
         // Define el color, acepta dos valores hexadecimales
-        public String setColor(int texto, int fondo){
-                return ansi(new int[] {38, 5, texto, 48, 5, fondo});
+        public void setColor(int texto, int fondo){
+                type(ansi(new int[] {38, 5, texto, 48, 5, fondo}));
         }
 
-        
+        // Mueve el cursor
+        public void move(String direccion, int cantidad){
+                move(posInArray(diccionarioDireccion, direccion), cantidad);
+        }
 
+        public void move(int direccion, int cantidad){
+                type(ansi(cantidad, (char)('A'+direccion)));
+        }
+
+        // Resetea el color
         public void reset(){
-                System.out.print(ansi(new int []{0, 39, 49})+ "\\033[" + arrayToString(new int []{0, 39, 49}) + sufijo);
+                type(ansi(0));
         }
 
-        public void type(String texto){
-                System.out.print(texto);
+        // Constructor: limpia la pantalla para mostrar lo que se tenga que mostrar luego
+        public Terminal(){
+                type(ansi(2,'J')+ansi(new int[] {0,0}, 'H'));
+                reset();
         }
 
         public void close(){
                 reset();
+                type("\n");
         }
 }
