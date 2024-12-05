@@ -2,9 +2,13 @@
 
 ## Ejecutar la aplicación
 
+### Desde el código fuente
+
+Se requiere de las herramientas de desrrollador de java (jdk) y se recomienda tener git tambien.
+
 Se puede descargar usando git
 ```
-git clone https://github.com/RayanBel/X
+git clone https://github.com/RayanBel/battleship-tui
 ```
 El archivo principal es `juego.java`.
 Para poder jugar se ha de compilar y ejecutar en la maquina virtual con
@@ -12,6 +16,10 @@ Para poder jugar se ha de compilar y ejecutar en la maquina virtual con
 javac juego.java
 java juego
 ```
+
+### Ejecutable
+
+Aun no disponible.
 
 ## La documentación
 
